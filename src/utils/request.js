@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { Message } from 'element-ui'
 
 const request = axios.create({
-  baseURL: ''
+  baseURL: process.env.VUE_APP_BASE_API
 })
 // 写请求拦截器
 // 方式1-从axios文档中拿到请求拦截器的方法
@@ -16,11 +17,28 @@ request.interceptors.request.use(config => {
   return Promise.reject(error)
 })
 // 响应拦截器
+// 错误处理-方式2-在响应拦截器中统一处理错误
 request.interceptors.response.use(response => {
+  // 正常情况
+  // 解构数据
+  // eslint-disable-next-line object-curly-spacing
+  const { data: { success, message, data } } = response
+  // 状态码为200 success 为false 的错误
+  if (success) {
+    // 简化数据返回， 直接返回数据
+    return data
+  } else {
+    Message.error(message)
+    // 方法1-产生一个错误 阻止代码执行
+    // throw new Error(message)
+    // 方式2-返回一个失败promise
+    throw Promise.reject(new Error(message))
+  }
   // Do something before response is sent
-  return response
 }, error => {
+  // 状态码为400,500的错误
   // Do something with response error
+  Message.error('服务器报错，请稍后重试')
   return Promise.reject(error)
 })
 export default request

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
+import store from '@/store/index'
+import router from '@/router/index' // 导入路由模块
 
 const request = axios.create({
   baseURL: process.env.VUE_APP_BASE_API
@@ -11,6 +13,10 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(config => {
   // Do something before request is sent
+  // 通过请求拦截器传token
+  if (store.state.user.token) {
+    config.headers.Authorization = 'Bearer ' + store.state.user.token
+  }
   return config
 }, error => {
   // Do something with request error
@@ -38,6 +44,11 @@ request.interceptors.response.use(response => {
 }, error => {
   // 状态码为400,500的错误
   // Do something with response error
+  // 判断是401错误，做出退出和跳转到登录页面
+  if (error.response && error.response.status === 401) {
+    store.dispatch('user/logout')
+    router.push('/login')
+  }
   Message.error('服务器报错，请稍后重试')
   return Promise.reject(error)
 })

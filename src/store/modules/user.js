@@ -1,11 +1,19 @@
-import { login } from '@/api/user.js'
+import { getUserBaseInfo, getEmployeeBaseInfo, login } from '@/api/user.js'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 export default {
   namespaced: true, // 锁，增加命名空间，避免重名
   state: {
-    token: getToken()
+    token: getToken(),
+    userInfo: {} // 定义数据
   },
   mutations: {
+    // 定义储存和清除的方法
+    setUserInfo(state, userInfo) {
+      state.userInfo = userInfo
+    },
+    removeUserInfo(state) {
+      state.userInfo = {}
+    },
     setToken(state, token) {
       state.token = token
       setToken(token)
@@ -16,6 +24,18 @@ export default {
     }
   },
   actions: { // 异步操作
+    // 定义退出的action
+    logout(context) {
+      context.commit('removeToken')
+      // 退出时清空公共数据
+      // 发请求获取数据并调用mutations
+      context.commit('removeUserInfo')
+    },
+    async getUserInfo(context) {
+      const u = await getUserBaseInfo()
+      const e = await getEmployeeBaseInfo(u.userId)
+      context.commit('setUserInfo', { ...u, ...e })
+    },
     async login(context, data) {
       // 通过alt + / 可以查看每个方法的描述 触发建议
       // const res = await login(data)

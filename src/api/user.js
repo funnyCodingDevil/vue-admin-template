@@ -23,6 +23,14 @@ export function getEmployeeBaseInfo(id) {
     method: 'get'
   })
 }
+
+// 获取员工简单列表
+export function getEmployeeSimple() {
+  return request({
+    url: '/sys/user/simple',
+    method: 'get'
+  })
+}
 export function logout() {
 
 }

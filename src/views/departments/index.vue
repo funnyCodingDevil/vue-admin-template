@@ -13,7 +13,7 @@
           <el-col>右</el-col>
         </el-row> -->
         <tree-tools :data="company">
-          <el-dropdown-item>新增子部门</el-dropdown-item>
+          <el-dropdown-item @click.native="onAdd(company)">新增子部门</el-dropdown-item>
         </tree-tools>
         <el-tree
           :data="list"
@@ -66,7 +66,8 @@ export default {
       currentNode: {}, // 当前点击的部门
       company: {
         name: '传智教育',
-        manager: '负责人'
+        manager: '负责人',
+        id: '' // 解决点击确认时，请求没有传pid的问题
       },
       list: [
         {
@@ -90,7 +91,7 @@ export default {
   methods: {
     async getDepartments() {
       const res = await getDepartments()
-      this.company = { name: res.companyName, manager: '负责人' }
+      this.company = { name: res.companyName, manager: '负责人', id: '' }
       this.list = tranListToTreeData(res.depts, '')
     },
     onAdd(node) {

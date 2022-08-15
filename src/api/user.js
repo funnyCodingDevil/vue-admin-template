@@ -31,6 +31,10 @@ export function getEmployeeSimple() {
     method: 'get'
   })
 }
-export function logout() {
 
+export function getCompanyInfo(id) {
+  return request({
+    url: '/company/' + id,
+    method: 'get'
+  })
 }

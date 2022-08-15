@@ -108,18 +108,22 @@ export default {
       // 分析包含哪些数据
       // 当前要添加的部门名称 - this.form.name
       const name = this.form.name
+      const { depts } = await getDepartments() // 两个判断都要用到这个数据，拿到外面声明
       let brothers
       // 编辑 - 根据本部门，在所有部门中找兄弟，并且排除自己部门
       if (this.form.id) {
-        const { depts } = await getDepartments()
         brothers = depts.filter(
-          t => t.pid === this.node.pid && t.id !== this.form.id
+          t => t.pid === this.node.pid && t.id !== this.node.id
         )
       } else {
         // 父部门 根据父部门找兄弟部门
         const parent = this.node
         // 同级部门 - 要添加的兄弟部门
-        brothers = parent.children
+        // brothers = parent.children
+        // 解决bug 名称没有校验重复
+        brothers = depts.filter(
+          t => t.pid === parent.id
+        )
       }
       // 同级别部门中是否存在重复名称的部门 如果有报错 没有就允许添加
       const f = brothers ? brothers.find((t) => t.name === name) : false

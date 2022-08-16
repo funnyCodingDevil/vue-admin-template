@@ -15,6 +15,11 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 import '@/directives' // 导入图片加载失败指令文件
+// 注册全局组件 - 方法1 通过Vue.component注册
+import '@/components'
+// 注册全局组件 - 方法2 通过Vue.use注册
+import Ui from '@/components/index.js'
+Vue.use(Ui)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

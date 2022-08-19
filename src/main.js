@@ -15,8 +15,18 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 import '@/directives' // 导入图片加载失败指令文件
+// 注册过滤器-方法1-简单模式
+import '@/filters' // 引入过滤器
+// 注册过滤器-方法2-单个注册
+/*
+  import { formatDate } from '@/filters/index'
+  Vue.filter('formatDate', formatDate)
+*/
+// 注册过滤器-方法2-批量注册
+import * as filters from '@/filters/index'
+Object.keys(filters).forEach(key => Vue.filter(key, filters[key]))
 // 注册全局组件 - 方法1 通过Vue.component注册
-import '@/components'
+// import '@/components'
 // 注册全局组件 - 方法2 通过Vue.use注册
 import Ui from '@/components/index.js'
 Vue.use(Ui)
@@ -46,3 +56,6 @@ new Vue({
   store,
   render: h => h(App)
 })
+
+const date = new Date()
+console.log(filters.formatDate(date))

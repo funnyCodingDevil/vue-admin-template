@@ -88,6 +88,7 @@
 import { getEmployeeSimple } from '@/api/user'
 import { getDepartments, addDepartment, updateDepartment } from '@/api/departments'
 export default {
+  name: 'Adddept',
   components: {},
   inheritAttrs: false,
   props: {

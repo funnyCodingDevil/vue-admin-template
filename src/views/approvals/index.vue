@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="app-container">
       <h2>
-         审批
+        审批
       </h2>
     </div>
   </div>
@@ -23,5 +23,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>

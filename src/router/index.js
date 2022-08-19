@@ -56,6 +56,12 @@ export const constantRoutes = [
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
+    },
+    {
+      // 配置二级路由
+      path: '/import',
+      component: () => import('@/views/import/index'),
+      hidden: true
     }]
   },
   // 404 page must be placed at the end !!!

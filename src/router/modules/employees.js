@@ -10,5 +10,24 @@ export default {
     name: 'employee',
     component: () => import('@/views/employees/index.vue'),
     meta: { title: '员工', icon: 'people' }
+  },
+  {
+    path: 'detail/:id', // params传参 动态路由传参
+    component: () => import('@/views/employees/detail'),
+    hidden: true, // 不在左侧菜单显示
+    props: true, // 将路由参数传递给组件
+    meta: {
+      title: '员工详情' // 标记当前路由规则的中文名称 后续在做左侧菜单时 使用
+    }
+  },
+  {
+    path: 'detail', // query传参 查询字符串
+    component: () => import('@/views/employees/detail'),
+    hidden: true // 不在左侧菜单显示
+  },
+  {
+    path: 'print/:id', // query传参 查询字符串
+    component: () => import('@/views/employees/print'),
+    hidden: true // 不在左侧菜单显示
   }]
 }

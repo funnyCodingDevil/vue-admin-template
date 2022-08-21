@@ -81,7 +81,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
-
+            <ImageUpload ref="userInfoStaffPhotoRef"></ImageUpload>
           </el-form-item>
         </el-col>
       </el-row>
@@ -123,6 +123,7 @@
 
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <ImageUpload ref="formDataStaffPhotoRef"></ImageUpload>
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select
@@ -547,7 +548,13 @@ export default {
   async created() {
     // 回显数据
     this.userInfo = await getEmployeeBaseInfo(this.userId)
+    if (this.userInfo.staffPhoto) {
+      this.$refs.userInfoStaffPhotoRef.fileList = [{ url: this.userInfo.staffPhoto }]
+    }
     this.formData = await getPersonalDetail(this.userId)
+    if (this.formData.staffPhoto) {
+      this.$refs.formDataStaffPhotoRef.fileList = [{ url: this.formData.staffPhoto }]
+    }
   },
   methods: {
     async saveUser() {

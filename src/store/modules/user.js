@@ -30,11 +30,15 @@ export default {
       // 退出时清空公共数据
       // 发请求获取数据并调用mutations
       context.commit('removeUserInfo')
+      // 退出,清空权限模块的数据 (通过root改变查找规则)
+      context.commit('permission/removeRoutes', null, { root: true })
     },
     async getUserInfo(context) {
       const u = await getUserBaseInfo()
       const e = await getEmployeeBaseInfo(u.userId)
       context.commit('setUserInfo', { ...u, ...e })
+      // 在action中返回标识
+      return u
     },
     async login(context, data) {
       // 通过alt + / 可以查看每个方法的描述 触发建议

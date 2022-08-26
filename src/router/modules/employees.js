@@ -7,7 +7,7 @@ export default {
   children: [{
     // path: '' 默认路由 当访问/employees默认访问到页面
     path: '',
-    name: 'employee',
+    name: 'employees',
     component: () => import('@/views/employees/index.vue'),
     meta: { title: '员工', icon: 'people' }
   },

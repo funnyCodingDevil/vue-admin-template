@@ -12,8 +12,12 @@
           <el-col>左</el-col>
           <el-col>右</el-col>
         </el-row> -->
+        <!-- 通过disabled 控制下拉的选择 -->
         <tree-tools :data="company">
-          <el-dropdown-item @click.native="onAdd(company)">新增子部门</el-dropdown-item>
+          <el-dropdown-item
+            :disabled="checkPermission('add-dept')"
+            @click.native="onAdd(company)"
+          >新增子部门</el-dropdown-item>
         </tree-tools>
         <el-tree
           :data="list"
@@ -27,7 +31,10 @@
             :data="data"
           >
             <!-- 父组件传递当前部门到子组件 data -->
-            <el-dropdown-item @click.native="onAdd(data)">新增子部门</el-dropdown-item>
+            <el-dropdown-item
+              :disabled="checkPermission('add-dept')"
+              @click.native="onAdd(data)"
+            >新增子部门</el-dropdown-item>
             <el-dropdown-item @click.native="onUpdate(data)">编辑部门</el-dropdown-item>
             <el-dropdown-item @click.native="onDel(data.id)">删除部门</el-dropdown-item>
           </tree-tools>
@@ -50,7 +57,11 @@
 
 <script>
 import TreeTools from './components/tree-tools.vue'
-import { delDepartment, getDepartments, getDepartmentById } from '@/api/departments'
+import {
+  delDepartment,
+  getDepartments,
+  getDepartmentById
+} from '@/api/departments'
 import { tranListToTreeData } from '@/utils/index'
 import AddDept from './components/add-dept.vue'
 export default {
@@ -89,6 +100,10 @@ export default {
   },
   mounted() {},
   methods: {
+    // 解决问题1-模板太长
+    /* checkPermission(key) {
+      return !this.$store.state.user.userInfo.roles.points.includes(key)
+    }, */
     async getDepartments() {
       const res = await getDepartments()
       this.company = { name: res.companyName, manager: '负责人', id: '' }

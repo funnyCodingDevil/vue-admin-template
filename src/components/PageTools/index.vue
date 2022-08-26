@@ -2,7 +2,14 @@
   <el-card>
     <el-row type="flex">
       <el-col>
-        <div class="before">
+        <!-- 控制页面显示 -->
+        <!-- 方法1 通过父传子 -->
+        <!-- <div v-if="hasBefore" class="before"> -->
+        <!-- 方法2 通过 $slots -->
+        <div
+          v-if="$slots.before"
+          class="before"
+        >
           <i class="el-icon-info" />
           <!-- 定义前面得插槽 -->
           <slot name="before"></slot>
@@ -13,9 +20,7 @@
           type="flex"
           justify="end"
         >
-          <el-col>
-            <slot name="after"></slot>
-          </el-col>
+          <slot name="after"></slot>
         </el-row>
       </el-col>
     </el-row>
@@ -25,6 +30,13 @@
 <script>
 export default {
   name: 'PageTools',
+  props: {
+    // 接收父组件数据
+    hasBefore: {
+      type: Boolean,
+      default: true
+    }
+  },
   data() {
     return {}
   },

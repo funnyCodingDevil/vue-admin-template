@@ -123,6 +123,7 @@
               <el-button
                 type="text"
                 size="small"
+                @click="onAssignRole(row.id)"
               >角色</el-button>
               <el-button
                 type="text"
@@ -284,21 +285,47 @@
         <el-button @click="close">取消</el-button>
         <el-button
           type="primary"
-          @click="handelConfirm"
+          @click="handleConfirm"
         >确定</el-button>
+      </el-row>
+    </el-dialog>
+    <el-dialog
+      title="分配角色"
+      :visible.sync="showAssignRoleDialog"
+    >
+      <el-checkbox-group v-model="checkRoleList">
+        <el-checkbox
+          v-for="(item, index) in roleList"
+          :key="index"
+          :label="item.id"
+        >{{ item.name }}</el-checkbox>
+      </el-checkbox-group>
+
+      <el-row
+        slot="footer"
+        type="flex"
+        justify="center"
+      >
+        <el-button @click="showAssignRoleDialog = false">取消</el-button>
+        <el-button
+          type="primary"
+          @click="handleAssignRoleConfirm"
+        >确认</el-button>
       </el-row>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getEmployeeList, addEmployee, delEmployee } from '@/api/employees'
+import { getEmployeeList, addEmployee, delEmployee, assignRoles } from '@/api/employees'
 import { pick } from 'lodash'
 import EmployeeEnum from '@/api/constant/employees'
 import QrcodeVue from 'qrcode.vue'
 import { tranListToTreeData } from '@/utils'
 import { getDepartments } from '@/api/departments'
 import { formatDate } from '@/filters'
+import { getRoleList } from '@/api/setting'
+import { getEmployeeBaseInfo } from '@/api/user'
 
 export default {
   name: 'Employee',
@@ -396,7 +423,11 @@ export default {
       // 获取枚举的值
       formOfEmploymentOptions: EmployeeEnum.hireType,
       deptsList: [], // departmentsList
-      showDeptsTree: false
+      showDeptsTree: false,
+      checkRoleList: [], // 选中角色列表
+      showAssignRoleDialog: false, // 是否显示分配角色
+      roleList: [], // 角色列表
+      currentUserId: undefined
     }
   },
   created() {
@@ -404,6 +435,26 @@ export default {
   },
   mounted() {},
   methods: {
+    async onAssignRole(id) {
+      // 储存用户id
+      this.currentUserId = id
+      this.showAssignRoleDialog = true
+      const res = await getRoleList({ page: 1, pagesize: 100 })
+      // console.log(res)
+      const { roleIds } = await getEmployeeBaseInfo(id)
+      this.checkRoleList = roleIds
+      this.roleList = res.rows
+    },
+    async handleAssignRoleConfirm() {
+      // 分配角色传数据
+      await assignRoles({
+        id: this.currentUserId,
+        roleIds: this.checkRoleList
+      })
+      // 提示和关闭对话框
+      this.$message.success('操作成功')
+      this.showAssignRoleDialog = false
+    },
     async onExport() {
       import('@/vendor/Export2Excel').then(async(excel) => {
         const headers = {
@@ -425,7 +476,9 @@ export default {
           // 对字段进行格式化
           n.timeOfEntry = formatDate(n.timeOfEntry)
           n.correctionTime = formatDate(n.correctionTime) // formaDate 通过选择，引入
-          n.formOfEmployment = this.$options.filters.formOfEmployment(n.formOfEmployment) // 通过$options 获取局部过滤器
+          n.formOfEmployment = this.$options.filters.formOfEmployment(
+            n.formOfEmployment
+          ) // 通过$options 获取局部过滤器
           return Object.values(n)
         })
         excel.export_json_to_excel({
@@ -466,7 +519,7 @@ export default {
       this.showAddDialog = false
       this.form = this.$options.data().form
     },
-    handelConfirm() {
+    handleConfirm() {
       this.$refs['formRef'].validate(async(valid) => {
         if (!valid) return
         // 请求

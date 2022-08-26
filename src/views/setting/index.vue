@@ -45,6 +45,7 @@
                   <el-button
                     size="small"
                     type="success"
+                    @click="onAssignPerm(row.id)"
                   >分配权限</el-button>
                   <el-button
                     size="small"
@@ -164,16 +165,46 @@
         <el-button @click="close">取消</el-button>
         <el-button
           type="primary"
-          @click="handelConfirm"
+          @click="handleConfirm"
         >确定</el-button>
       </div>
+    </el-dialog>
+    <el-dialog
+      title="分配权限"
+      :visible.sync="showAssignPermDialog"
+    >
+      <!-- 配置树组件 -->
+      <!-- 给选中值，父子不关联 -->
+      <!-- @check-change="onCheckChange" 方法1 通过事件选中数据的同时更新 -->
+      <!-- 方法二 给组件取别名 -->
+      <el-tree ref="treeRef" :data="perList" :props="{label: 'name'}" show-checkbox default-expand-all node-key="id" :default-checked-keys="checkPremList" check-strictly />
+      <el-row
+        slot="footer"
+        type="flex"
+        justify="center"
+      >
+        <el-button @click="showAssignPermDialog = false">取 消</el-button>
+        <el-button
+          type="primary"
+          @click="handleAssignPermDialog"
+        >确 定</el-button>
+      </el-row>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import { getCompanyInfo } from '@/api/user'
-import { addRole, getRoleList, delRole, getRoleById, updateRole } from '@/api/setting'
+import {
+  addRole,
+  getRoleList,
+  delRole,
+  getRoleById,
+  updateRole,
+  assignPerm
+} from '@/api/setting'
+import { tranListToTreeData } from '@/utils'
+import { getPermissionList } from '@/api/permission'
 export default {
   name: 'Setting',
   components: {},
@@ -201,7 +232,11 @@ export default {
           }
         ],
         description: []
-      }
+      },
+      showAssignPermDialog: false, // 控制对话框数据
+      perList: [],
+      checkPremList: [],
+      currentRoleId: undefined
     }
   },
   created() {
@@ -213,6 +248,33 @@ export default {
     console.log('$options', this.$options)
   },
   methods: {
+    // 方法1-通过事件实现选中数据的同步
+    /* onCheckChange(item, isChecked) {
+      if (isChecked) {
+        this.checkedPermList.push(item.id)
+      } else {
+        const index = this.checkedPermList.findIndex(t => item.id)
+        this.checkedPermList.splice(index, 1)
+      }
+    }, */
+    async onAssignPerm(id) {
+      // 显示对话框和获取数据列表
+      this.currentRoleId = id
+      // 回显数据
+      const { permIds } = await getRoleById(id)
+      this.checkPremList = permIds
+      this.perList = tranListToTreeData(await getPermissionList(), '0')
+      this.showAssignPermDialog = true
+    },
+    // 方法二-通过调用组件的方法获取选中数据
+    async handleAssignPermDialog() {
+      await assignPerm({
+        id: this.currentRoleId,
+        permIds: this.$refs.treeRef.getCheckedKeys()
+      })
+      this.$message.success('操作成功')
+      this.showAssignPermDialog = false
+    },
     async onUpdate(id) {
       // 数据回显
       this.form = await getRoleById(id)
@@ -268,7 +330,7 @@ export default {
       this.form = this.$options.data().form
       this.$emit('update:visible', false)
     },
-    handelConfirm() {
+    handleConfirm() {
       this.$refs['formRef'].validate(async(valid) => {
         if (!valid) return
         // 发请求

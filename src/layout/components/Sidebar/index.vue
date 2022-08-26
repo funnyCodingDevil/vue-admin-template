@@ -31,7 +31,10 @@ export default {
       'sidebar'
     ]),
     routes() {
-      return this.$router.options.routes
+      // 方法1-菜单从路由的原始配置来,(阅读侧边栏代码) options.routes原始配置
+      // return this.$router.options.routes
+      // 方法2-从vuex拿
+      return this.$store.state.permission.routes
     },
     activeMenu() {
       const route = this.$route

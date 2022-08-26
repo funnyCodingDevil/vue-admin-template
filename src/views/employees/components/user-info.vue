@@ -549,20 +549,41 @@ export default {
     // 回显数据
     this.userInfo = await getEmployeeBaseInfo(this.userId)
     if (this.userInfo.staffPhoto) {
-      this.$refs.userInfoStaffPhotoRef.fileList = [{ url: this.userInfo.staffPhoto }]
+      this.$refs.userInfoStaffPhotoRef.fileList = [
+        { url: this.userInfo.staffPhoto }
+      ]
     }
     this.formData = await getPersonalDetail(this.userId)
     if (this.formData.staffPhoto) {
-      this.$refs.formDataStaffPhotoRef.fileList = [{ url: this.formData.staffPhoto }]
+      this.$refs.formDataStaffPhotoRef.fileList = [
+        { url: this.formData.staffPhoto }
+      ]
     }
   },
   methods: {
     async saveUser() {
-      await saveUserDetailById(this.userInfo)
+      // 1.在vuex中快速定位组件 查看数据结构
+      // 2.获取数据和状态，判断是否在上传中
+      const { fileList, started } = this.$refs.userInfoStaffPhotoRef
+      if (started) {
+        return this.$message.error('正在上传中')
+      }
+      await saveUserDetailById({
+        ...this.userInfo,
+        // 获取头像，上传发请求
+        staffPhoto: fileList.length > 0 ? fileList[0].url : undefined
+      })
       this.$message.success('操作成功')
     },
     async savePersonal() {
-      await updatePersonal(this.formData)
+      const { fileList, started } = this.$refs.formDataStaffPhotoRef
+      if (started) {
+        return this.$message.error('正在上传中')
+      }
+      await updatePersonal({
+        ...this.formData,
+        staffPhoto: fileList.length > 0 ? fileList[0].url : undefined
+      })
       this.$message.success('操作成功')
     }
   }

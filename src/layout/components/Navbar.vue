@@ -12,6 +12,10 @@
     <!-- <breadcrumb class="breadcrumb-container" /> -->
 
     <div class="right-menu">
+      <!-- 解决对齐问题 添加类名 -->
+      <LangSelect class="right-menu-item"></LangSelect>
+      <Screenfull class="right-menu-item"></Screenfull>
+      <theme-picker class="right-menu-item" style="position: relative; top: 7px;" />
       <el-dropdown
         class="avatar-container"
         trigger="click"
@@ -142,7 +146,7 @@ export default {
       height: 100%;
       font-size: 18px;
       color: #5a5e66;
-      vertical-align: text-bottom;
+      // vertical-align: text-bottom;
 
       &.hover-effect {
         cursor: pointer;
